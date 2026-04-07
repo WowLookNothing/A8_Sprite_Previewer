@@ -17,7 +17,7 @@ def load_sprite(sprite_folder_name, number_of_frames):
 
 class SpritePreview(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, image):
         super().__init__()
         self.setWindowTitle("Sprite Animation Preview")
         # This loads the provided sprite and would need to be changed for your own.
@@ -27,6 +27,9 @@ class SpritePreview(QMainWindow):
         # Add any other instance variables needed to track information as the program
         # runs here
 
+        self.label = QLabel()
+        self.image = image
+
         # Make the GUI in the setupUI method
         self.setupUI()
 
@@ -34,7 +37,23 @@ class SpritePreview(QMainWindow):
     def setupUI(self):
         # An application needs a central widget - often a QFrame
         frame = QFrame()
+        pixmap = QPixmap(self.image)
+        self.label.setPixmap(pixmap)
 
+
+        application_layout = QVBoxLayout()
+        application_layout.addWidget(self.label)
+
+        color_button = QPushButton("Colored Image")
+        grayscale_button = QPushButton("Grayscale Image")
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(color_button)
+        button_layout.addWidget(grayscale_button)
+
+        application_layout.addLayout(button_layout)
+
+        frame.setLayout(application_layout)
         # Add a lot of code here to make layouts, more QFrame or QWidgets, and
         # the other components of the program.
         # Create needed connections between the UI components and slot methods
@@ -48,9 +67,9 @@ class SpritePreview(QMainWindow):
 
 def main():
     app = QApplication([])
-    # Create our custom application
-    window = SpritePreview()
-    # And show it
+    image = QImage('ColorfulTown.png')
+    window = SpritePreview(image)
+
     window.show()
     app.exec()
 
