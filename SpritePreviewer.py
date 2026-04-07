@@ -77,8 +77,9 @@ class SpritePreview(QMainWindow):
     # You will need methods in the class to act as slots to connect to signals
     def animate(self):
         if self.current_image < self.num_frames:
-            pass
-        pass
+            self.current_image += 1
+        else:
+            self.current_image = 0
     def adjust_speed(self):
         pass
 
