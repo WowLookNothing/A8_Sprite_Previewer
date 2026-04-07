@@ -3,6 +3,7 @@ import math
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
+from PyQt6.QtCore import QTimer
 
 # This function loads a series of sprite images stored in a folder with a
 # consistent naming pattern: sprite_# or sprite_##. It returns a list of the images.
@@ -22,14 +23,13 @@ class SpritePreview(QMainWindow):
         self.setWindowTitle("Sprite Animation Preview")
         # This loads the provided sprite and would need to be changed for your own.
         self.num_frames = 21
-        self.frames = load_sprite('spriteImages',self.num_frames)
+        self.frames = load_sprite('spriteImages', self.num_frames)
 
         # Add any other instance variables needed to track information as the program
         # runs here
 
         self.label = QLabel()
-        self.image = self.frames
-        self.current_image = 1
+        self.current_image = 0
 
         # Make the GUI in the setupUI method
         self.setupUI()
@@ -39,18 +39,18 @@ class SpritePreview(QMainWindow):
         # An application needs a central widget - often a QFrame
         frame = QFrame()
         # pixmap = QPixmap(self.image)
-        self.label.setPixmap(self.image[self.current_image])
+        self.label.setPixmap(self.frames[self.current_image])
+        print(self.current_image)
 
 
-
-
-        color_button = QPushButton("Colored Image")
-        slider = QSlider()
         label = QLabel("tester")
 
         lcd = QLCDNumber()
         lcd.setMinimumHeight(60)
 
+        slider = QSlider()
+        slider.setRange(1, 100)
+        slider.valueChanged.connect(self.adjust_speed)
         slider.valueChanged.connect(lcd.display)
 
 
@@ -61,9 +61,11 @@ class SpritePreview(QMainWindow):
         application_layout = QHBoxLayout()
         application_layout.addWidget(self.label)
         application_layout.addWidget(lcd)
-
-
         application_layout.addLayout(button_layout)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.animate)
+        self.timer.start(200)
 
         frame.setLayout(application_layout)
         # Add a lot of code here to make layouts, more QFrame or QWidgets, and
@@ -76,12 +78,17 @@ class SpritePreview(QMainWindow):
 
     # You will need methods in the class to act as slots to connect to signals
     def animate(self):
-        if self.current_image < self.num_frames:
-            self.current_image += 1
-        else:
+        self.current_image += 1
+        if self.current_image >= self.num_frames:
             self.current_image = 0
-    def adjust_speed(self):
-        pass
+
+        self.label.setPixmap(self.frames[self.current_image])
+
+        self.repaint()
+
+    def adjust_speed(self, value):
+        delay_in_ms = int(1000 / value)
+        self.timer.start(delay_in_ms)
 
 
 def main():
