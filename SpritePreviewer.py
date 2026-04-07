@@ -28,7 +28,8 @@ class SpritePreview(QMainWindow):
         # runs here
 
         self.label = QLabel()
-        self.image = image
+        self.image = self.frames
+        self.current_image = 1
 
         # Make the GUI in the setupUI method
         self.setupUI()
@@ -37,19 +38,30 @@ class SpritePreview(QMainWindow):
     def setupUI(self):
         # An application needs a central widget - often a QFrame
         frame = QFrame()
-        pixmap = QPixmap(self.image)
-        self.label.setPixmap(pixmap)
+        # pixmap = QPixmap(self.image)
+        self.label.setPixmap(self.image[self.current_image])
 
 
-        application_layout = QVBoxLayout()
-        application_layout.addWidget(self.label)
+
 
         color_button = QPushButton("Colored Image")
-        grayscale_button = QPushButton("Grayscale Image")
+        slider = QSlider()
+        label = QLabel("tester")
 
-        button_layout = QHBoxLayout()
-        button_layout.addWidget(color_button)
-        button_layout.addWidget(grayscale_button)
+        lcd = QLCDNumber()
+        lcd.setMinimumHeight(60)
+
+        slider.valueChanged.connect(lcd.display)
+
+
+        button_layout = QVBoxLayout()
+        button_layout.addWidget(label)
+        button_layout.addWidget(slider)
+
+        application_layout = QHBoxLayout()
+        application_layout.addWidget(self.label)
+        application_layout.addWidget(lcd)
+
 
         application_layout.addLayout(button_layout)
 
@@ -63,6 +75,12 @@ class SpritePreview(QMainWindow):
 
 
     # You will need methods in the class to act as slots to connect to signals
+    def animate(self):
+        if self.current_image < self.num_frames:
+            pass
+        pass
+    def adjust_speed(self):
+        pass
 
 
 def main():
