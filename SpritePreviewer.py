@@ -1,35 +1,28 @@
 #Cassandra Manning u1577928
-#GitHub repo = A8_Sprite_Previewer
+#GitHub repo = https://github.com/WowLookNothing/A8_Sprite_Previewer
 
 import math
-
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
 from PyQt6.QtCore import QTimer
 
-# This function loads a series of sprite images stored in a folder with a
-# consistent naming pattern: sprite_# or sprite_##. It returns a list of the images.
 def load_sprite(sprite_folder_name, number_of_frames):
     frames = []
     padding = math.ceil(math.log(number_of_frames - 1, 10))
     for frame in range(number_of_frames):
         folder_and_file_name = sprite_folder_name + "/sprite_" + str(frame).rjust(padding, '0') + ".png"
         frames.append(QPixmap(folder_and_file_name))
-
     return frames
 
 class SpritePreview(QMainWindow):
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Sprite Animation Preview")
-        # This loads the provided sprite and would need to be changed for your own.
         self.num_frames = 21
         self.frames = load_sprite('spriteImages', self.num_frames)
-
         self.image = QLabel()
         self.current_image = 0
+
         self.timer = QTimer()
         self.timer_on = False
         self.current_fps = 0
@@ -41,21 +34,14 @@ class SpritePreview(QMainWindow):
 
         self.setupUI()
 
-
     def setupUI(self):
         frame = QFrame()
+
         self.image.setPixmap(self.frames[self.current_image])
-
-
         self.timer.timeout.connect(self.animate)
         self.timer_on = False
-        # self.timer.start(200)
-
 
         self.start_stop_button.clicked.connect(self.start_or_stop)
-
-        slider_label = QLabel("FPS Adjuster")
-        fps_label = QLabel("Frames per second:")
 
         self.slider.setRange(1, 100)
         self.slider.valueChanged.connect(self.adjust_speed)
@@ -70,6 +56,9 @@ class SpritePreview(QMainWindow):
 
         menu.addAction(pause_action)
         menu.addAction(exit_action)
+
+        slider_label = QLabel("FPS Adjuster")
+        fps_label = QLabel("Frames per second:")
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.start_stop_button)
