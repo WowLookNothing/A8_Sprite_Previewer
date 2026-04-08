@@ -21,7 +21,7 @@ def load_sprite(sprite_folder_name, number_of_frames):
 
 class SpritePreview(QMainWindow):
 
-    def __init__(self, image):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("Sprite Animation Preview")
         # This loads the provided sprite and would need to be changed for your own.
@@ -149,8 +149,7 @@ class SpritePreview(QMainWindow):
 
 def main():
     app = QApplication([])
-    image = QImage('ColorfulTown.png')
-    window = SpritePreview(image)
+    window = SpritePreview()
 
     window.show()
     app.exec()
