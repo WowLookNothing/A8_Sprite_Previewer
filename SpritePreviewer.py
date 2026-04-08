@@ -25,53 +25,65 @@ class SpritePreview(QMainWindow):
         self.num_frames = 21
         self.frames = load_sprite('spriteImages', self.num_frames)
 
-        # Add any other instance variables needed to track information as the program
-        # runs here
-
-        self.label = QLabel()
+        self.image = QLabel()
         self.current_image = 0
+        self.timer = QTimer()
+        self.timer_on = False
+        self.current_fps = 0
+        self.slider = QSlider()
+        self.slider.setTickInterval(20)
+        self.slider.setTickPosition(QSlider.TickPosition.TicksLeft)
+        self.fps_label = QLabel("FPS:" + str(self.current_fps))
+        self.start_stop_button = QPushButton("Start")
 
-        # Make the GUI in the setupUI method
         self.setupUI()
 
 
     def setupUI(self):
-        # An application needs a central widget - often a QFrame
         frame = QFrame()
-        # pixmap = QPixmap(self.image)
-        self.label.setPixmap(self.frames[self.current_image])
-        print(self.current_image)
+        self.image.setPixmap(self.frames[self.current_image])
 
 
-        label = QLabel("tester")
-
-        lcd = QLCDNumber()
-        lcd.setMinimumHeight(60)
-
-        slider = QSlider()
-        slider.setRange(1, 100)
-        slider.valueChanged.connect(self.adjust_speed)
-        slider.valueChanged.connect(lcd.display)
+        self.timer.timeout.connect(self.animate)
+        self.timer_on = False
+        # self.timer.start(200)
 
 
-        button_layout = QVBoxLayout()
-        button_layout.addWidget(label)
-        button_layout.addWidget(slider)
+        self.start_stop_button.clicked.connect(self.start_or_stop)
 
-        application_layout = QHBoxLayout()
-        application_layout.addWidget(self.label)
-        application_layout.addWidget(lcd)
+        slider_label = QLabel("FPS Adjuster")
+
+        self.slider.setRange(1, 100)
+        self.slider.valueChanged.connect(self.adjust_speed)
+
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.start_stop_button)
+
+        slider_layout = QVBoxLayout()
+        slider_layout.addWidget(slider_label)
+        slider_layout.addWidget(self.slider)
+
+
+        picture_layout = QHBoxLayout()
+        picture_layout.addStretch()
+        picture_layout.addWidget(self.image)
+        picture_layout.addStretch()
+        picture_layout.addLayout(slider_layout)
+        picture_layout.addStretch()
+
+        label_layout = QHBoxLayout()
+        label_layout.addStretch()
+        label_layout.addWidget(self.fps_label)
+        label_layout.addStretch()
+
+        application_layout = QVBoxLayout()
+        application_layout.addLayout(picture_layout)
+        application_layout.addLayout(label_layout)
         application_layout.addLayout(button_layout)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.animate)
-        self.timer.start(200)
 
         frame.setLayout(application_layout)
-        # Add a lot of code here to make layouts, more QFrame or QWidgets, and
-        # the other components of the program.
-        # Create needed connections between the UI components and slot methods
-        # you define in this class.
 
         self.setCentralWidget(frame)
 
@@ -82,13 +94,31 @@ class SpritePreview(QMainWindow):
         if self.current_image >= self.num_frames:
             self.current_image = 0
 
-        self.label.setPixmap(self.frames[self.current_image])
+        self.image.setPixmap(self.frames[self.current_image])
 
         self.repaint()
 
     def adjust_speed(self, value):
-        delay_in_ms = int(1000 / value)
-        self.timer.start(delay_in_ms)
+        if self.timer_on:
+            delay_in_ms = int(1000 / value)
+            self.timer.start(delay_in_ms)
+            self.current_fps = value
+        else:
+            self.slider.setValue(0)
+
+        self.fps_label.setText("FPS:" + str(self.current_fps))
+
+
+    def start_or_stop(self):
+        if self.timer_on:
+            self.timer_on = False
+            self.timer.stop()
+            self.adjust_speed(0)
+            self.start_stop_button.setText("Start")
+        else:
+            self.timer_on = True
+            self.adjust_speed(1)
+            self.start_stop_button.setText("Stop")
 
 
 def main():
