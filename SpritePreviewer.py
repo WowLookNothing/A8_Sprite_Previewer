@@ -1,3 +1,6 @@
+#Cassandra Manning u1577928
+#GitHub repo = A8_Sprite_Previewer
+
 import math
 
 from PyQt6.QtGui import *
@@ -32,8 +35,8 @@ class SpritePreview(QMainWindow):
         self.current_fps = 0
         self.slider = QSlider()
         self.slider.setTickInterval(20)
-        self.slider.setTickPosition(QSlider.TickPosition.TicksLeft)
-        self.fps_label = QLabel("FPS:" + str(self.current_fps))
+        self.slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.fps_label = QLabel(str(self.current_fps))
         self.start_stop_button = QPushButton("Start")
 
         self.setupUI()
@@ -52,10 +55,21 @@ class SpritePreview(QMainWindow):
         self.start_stop_button.clicked.connect(self.start_or_stop)
 
         slider_label = QLabel("FPS Adjuster")
+        fps_label = QLabel("Frames per second:")
 
         self.slider.setRange(1, 100)
         self.slider.valueChanged.connect(self.adjust_speed)
 
+        menubar = self.menuBar()
+        menubar.setNativeMenuBar(False)
+        menu = menubar.addMenu("&Menu")
+        pause_action = QAction("&Pause", self)
+        pause_action.triggered.connect(self.stop)
+        exit_action = QAction("&Exit", self)
+        exit_action.triggered.connect(self.quit_program)
+
+        menu.addAction(pause_action)
+        menu.addAction(exit_action)
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.start_stop_button)
@@ -63,7 +77,6 @@ class SpritePreview(QMainWindow):
         slider_layout = QVBoxLayout()
         slider_layout.addWidget(slider_label)
         slider_layout.addWidget(self.slider)
-
 
         picture_layout = QHBoxLayout()
         picture_layout.addStretch()
@@ -74,6 +87,7 @@ class SpritePreview(QMainWindow):
 
         label_layout = QHBoxLayout()
         label_layout.addStretch()
+        label_layout.addWidget(fps_label)
         label_layout.addWidget(self.fps_label)
         label_layout.addStretch()
 
@@ -105,20 +119,32 @@ class SpritePreview(QMainWindow):
             self.current_fps = value
         else:
             self.slider.setValue(0)
+            self.current_fps = 0
 
-        self.fps_label.setText("FPS:" + str(self.current_fps))
+        self.fps_label.setText(str(self.current_fps))
 
 
-    def start_or_stop(self):
-        if self.timer_on:
-            self.timer_on = False
-            self.timer.stop()
-            self.adjust_speed(0)
-            self.start_stop_button.setText("Start")
+    def start_or_stop(self, *args):
+        if not self.timer_on:
+            self.start()
+
         else:
-            self.timer_on = True
-            self.adjust_speed(1)
-            self.start_stop_button.setText("Stop")
+            self.stop()
+
+    def stop(self):
+        self.timer_on = False
+        self.timer.stop()
+        self.adjust_speed(0)
+        self.start_stop_button.setText("Start")
+
+    def start(self):
+        self.timer_on = True
+        self.adjust_speed(1)
+        self.start_stop_button.setText("Stop")
+
+    def quit_program(self):
+        self.close()
+
 
 
 def main():
